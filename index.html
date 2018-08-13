@@ -29,7 +29,7 @@
 						<div class="control">
 							<label class="label is-centered">Enter Unsplash search term</label>
 							<input @keyup="loadImages" autofocus v-model="term" class="input " id="searchTerm" type="text" 
-							placeholder="search term..."> <button class="button is-link is-outlined is-medium" style="margin-left: 600px; margin-top: -40px;" onclick="loadImages()"><i class="fas fa-search fa-1x"></i> </button> 
+							placeholder="search term..."> <button @click="loadImages" class="button is-link is-outlined is-medium" style="margin-left: 600px; margin-top: -40px;"><i class="fas fa-search fa-1x"></i> </button> 
 						</div>
 					</div>
 					
