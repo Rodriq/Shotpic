@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Unsplash Demo</title>
+	<link rel="stylesheet" href="assets/css/bulma.css">
+	<link rel="stylesheet" type="text/css" href="assets/fonts/css/fontawesome.css">
+	<script type="text/javascript" src="assets/js/jquery.js"></script>
+	<script type="text/javascript" src="assets/js/moment.js"></script>
+</head>
+<body>
+	<div>
+		<nav class="navbar is-link is-inverse" role="navigation" aria-label="main navigation">
+			<div class="navbar-brand">
+				<a class="navbar-item" href="https://bulma.io">
+					<img src="./public/image/logo.png" alt="Shot Pic: a msimple image enginex" width="60" height="auto">
+				</a>
+
+				<a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+					<span aria-hidden="true"></span>
+					<span aria-hidden="true"></span>
+					<span aria-hidden="true"></span>
+				</a>
+			</div>
+		</nav>
+		<div class="container" id="app" style="display: none;">
+			<div class="field">
+				<div class="columns is-centered">
+					<div class="column is-half">
+						<div class="control">
+							<label class="label is-centered">Enter Unsplash search term</label>
+							<input @keyup="loadImages" autofocus v-model="term" class="input " id="searchTerm" type="text" 
+							placeholder="search term..."> <button class="button is-link is-outlined is-medium" style="margin-left: 600px; margin-top: -40px;" onclick="loadImages()"><i class="fas fa-search fa-1x"></i> </button> 
+						</div>
+					</div>
+					
+				</div>
+				<section class="section">
+					<div class="container columns is-multiline">
+						<div class="column is-one-third" v-for="photo in photos">
+							<div class="card">
+								<header class="card-header">
+									<p class="card-header-title">
+										By: 
+										<a v-bind:href="photo.user.links.self" class="card-header-icon" aria-label="more options">
+											{{ photo.user.name }}
+										</a>
+									</p>
+								</header>
+								<div class="card-image">
+									<figure class="image is-4by3">
+										<img v-bind:src="photo.urls.regular" alt="Placeholder image">
+									</figure>
+								</div>
+								<div class="card-content">
+									<div class="media">
+										<div class="media-left">
+											<figure class="image is-48x48">
+												<img :src="photo.user.profile_image.small" alt="Placeholder image">
+											</figure>
+										</div>
+										<div class="media-content">
+											<p class="title is-6">{{ photo.user.name }}</p>
+											<p class="subtitle is-12">@{{ photo.user.username }}</p>
+										</div>
+									</div>
+									<div class="content">
+										<b>posted on:  </b> <time> {{ photo.created_at }}</time>
+									</div>
+								</div>
+								<footer class="card-footer">
+									<a href="#" @click.prevent="" class="card-footer-item button is-dark is-outlined"><i class="far fa-thumbs-up"></i> Like</a>
+									<a href="#" @click.prevent="" class="card-footer-item button is-success is-outlined"><i class="fas fa-share-alt"></i>  Share</a>
+									<a href="#" @click.prevent="downloadImage(photo.id)" class="card-footer-item button is-link is-outlined"><i class="fas fa-arrow-circle-down"></i>  Download</a>
+								</footer>
+							</div>
+						</div>
+					</div>	
+				</section>
+				
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="assets/js/axios.js"></script>
+	<script type="text/javascript" src="assets/js/lodash.js"></script>
+	<script type="text/javascript" src="assets/js/vue.js"></script>
+	<script type="text/javascript" src="assets/fonts/js/fontawesome.js"></script>
+	<script type="text/javascript">
+		let http = axios.create({
+			baseURL: 'http://localhost:3000/api',
+			// baseURL: 'https://api.unsplash.com',
+			params: {
+				client_id: 'dcfdc07a0e58418158e22b05d40e4a00758b951ab756b1ea400227f318a7846c'
+			}
+		});
+
+		// $('#searchTerm').on('keyup',);
+		Vue.prototype.$http = http
+
+		let app = new Vue({
+			el: '#app',
+			data () {
+				return {
+					term: '',
+					photos: []
+				}
+			},
+			methods: {
+				loadImages:	_.debounce(function(){
+					this.$http.get(`photos?term=${this.term}`)
+					.then(res => {
+						this.photos = res.data.results;
+						console.log(this.photos[0])
+						for(var i = 0, length1 = this.photos.length; i < length1; i++){
+							var date = this.photos[i].created_at
+							$('time')[i].innerHTML = moment(date).format('Mo-MMM-YYYY')
+						}
+					})
+					.catch(err => {
+						console.log(err);
+					});
+				}, 300),
+				downloadImage (id) {
+					this.$http.get(`download?id=${id}`).
+					then(res => {
+						console.log(res.data);
+					})
+				}
+			},
+			mounted () {
+				$('#app').show();
+				console.log('Welcome to vue.js');
+			}
+		});
+
+	</script>
+</body>
+</html>
